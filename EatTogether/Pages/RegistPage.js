@@ -1,18 +1,17 @@
+// 회원가입 페이지
+
 // SignUp.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 
-const RegistPage = () => {
+const SignUp = () => {
     const [name, setName] = useState(''); // enter name
     const [email, setEmail] = useState(''); // enter email
     const [password, setPassword] = useState(''); // Enter Password
     const [confirmPassword, setConfirmPassword] = useState(''); // Confirm Password
     const [passwordMatch, setPasswordMatch] = useState(true); // Match Password
     const [gender, setGender] = useState(null); // Enter gender (optional)
-
-    // 회원가입 php주소.
-    const php_host = "http://34.64.100.63/eatTogether/checkEmail.php";
 
     const handleSubmit = () => {
         // Check if the passwords match
@@ -22,7 +21,7 @@ const RegistPage = () => {
         }
 
         // Check if the email is already registered
-        fetch(php_host, {
+        fetch('http://34.64.100.63/eatTogether/checkEmail.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -37,7 +36,7 @@ const RegistPage = () => {
                 }
 
                 // If the email is not registered, register the user
-                fetch(php_host, {
+                fetch('http://34.64.100.63/eatTogether/registerUser.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -59,23 +58,25 @@ const RegistPage = () => {
             });
     };
 
-    const handleCheckboxChange = (value) => {
-
-        setGender(value)
+    const handleCheckboxChange = (checked) => {
+        // Update the gender state based on the value of checked (true or false)
+        if (checked) {
+            setGender('male');
+        } else {
+            setGender('female');
+        }
     }
 
     return (
         // Style code
         <View style={styles.container}>
             <Text style={styles.title}>잇투게더 회원가입</Text>
-            <Text style={styles.inputLabel}>이름을 입력해 주세요.</Text>
             <TextInput
                 style={styles.input}
                 placeholder="이름"
                 value={name}
                 onChangeText={text => setName(text)}
             />
-            <Text style={styles.inputLabel}>이메일을 입력해 주세요.</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -83,15 +84,13 @@ const RegistPage = () => {
                 value={email}
                 onChangeText={text => setEmail(text)}
             />
-            <Text style={styles.inputLabel}>비밀번호를 입력해 주세요.</Text>
             <TextInput
                 style={styles.input}
-                placeholder="비밀번호"
+                placeholder="비밀번호를 입력해주세요"
                 secureTextEntry={true}
                 value={password}
                 onChangeText={text => setPassword(text)}
             />
-            <Text style={styles.inputLabel}>비밀번호를 다시 한 번 입력해 주세요.</Text>
             <TextInput
                 style={[styles.input, !passwordMatch && styles.inputError]}
                 placeholder="비밀번호 확인"
@@ -109,17 +108,17 @@ const RegistPage = () => {
             <View style={styles.checkboxContainer}>
                 <CheckBox
                     value={gender === 'male'}
-                    onValueChange={() => handleCheckboxChange('male')}
+                    onValueChange={handleCheckboxChange}
                 />
                 <Text style={styles.checkboxLabel}>Male</Text>
                 <CheckBox
                     value={gender === 'female'}
-                    onValueChange={() => handleCheckboxChange('female')}
+                    onValueChange={handleCheckboxChange}
                 />
                 <Text style={styles.checkboxLabel}>Female</Text>
             </View>
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                <Text style={styles.buttonText}>회원가입 하기</Text>
+                <Text style={styles.buttonText}>회원가입!!</Text>
             </TouchableOpacity>
         </View>
     );
@@ -136,15 +135,10 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 30,
-    },
-    inputLabel:{
-        fontSize: 14,
-        marginBottom: 6,
-
+        marginBottom: 24,
     },
     input: {
-        width: '70%',
+        width: '80%',
         height: 48,
         padding: 12,
         borderWidth: 1,
@@ -162,7 +156,7 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     button: {
-        width: '70%',
+        width: '80%',
         height: 48,
         backgroundColor: '#007bff',
         borderRadius: 4,
@@ -183,4 +177,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default RegistPage;
+export default SignUp;
