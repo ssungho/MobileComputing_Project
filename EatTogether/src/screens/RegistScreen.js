@@ -1,17 +1,18 @@
-// 회원가입 페이지
-
-// SignUp.js
+// registPage.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 
-const SignUp = () => {
+const RegistScreen = () => {
     const [name, setName] = useState(''); // enter name
     const [email, setEmail] = useState(''); // enter email
     const [password, setPassword] = useState(''); // Enter Password
     const [confirmPassword, setConfirmPassword] = useState(''); // Confirm Password
     const [passwordMatch, setPasswordMatch] = useState(true); // Match Password
     const [gender, setGender] = useState(null); // Enter gender (optional)
+
+    // 회원가입 php주소.
+    const php_regist = "http://34.64.100.63/eatTogether/registUser.php";
 
     const handleSubmit = () => {
         // Check if the passwords match
@@ -21,62 +22,46 @@ const SignUp = () => {
         }
 
         // Check if the email is already registered
-        fetch('http://34.64.100.63/eatTogether/checkEmail.php', {
+        fetch(php_regist, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: `email=${encodeURIComponent(email)}`,
+            body: `name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&gender=${encodeURIComponent(gender)}`,
         })
             .then((response) => response.text())
             .then((responseText) => {
-                if (responseText === 'duplicate') { // 변경: 'exist' -> 'duplicate'
+                if (responseText === 'duplicate') {
                     Alert.alert('알림', '이미 등록된 이메일입니다.');
-                    return;
+                } else if (responseText === 'success') {
+                    Alert.alert('회원가입 완료', '회원가입이 완료되었습니다!');
+                } else {
+                    Alert.alert('오류', '회원가입 중 오류가 발생했습니다.');
                 }
-
-                // If the email is not registered, register the user
-                fetch('http://34.64.100.63/eatTogether/registerUser.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `name=${encodeURIComponent(name)}&email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}&gender=${encodeURIComponent(gender)}`,
-                })
-                    .then((response) => response.text())
-                    .then((responseText) => {
-                        console.log(responseText);
-                        // Show success popup
-                        Alert.alert('회원가입 완료', '회원가입이 완료되었습니다!');
-                    })
-                    .catch((error) => {
-                        console.error(error);
-                    });
             })
             .catch((error) => {
                 console.error(error);
             });
+        
     };
 
-    const handleCheckboxChange = (checked) => {
-        // Update the gender state based on the value of checked (true or false)
-        if (checked) {
-            setGender('male');
-        } else {
-            setGender('female');
-        }
+    const handleCheckboxChange = (value) => {
+
+        setGender(value);
     }
 
     return (
         // Style code
         <View style={styles.container}>
             <Text style={styles.title}>잇투게더 회원가입</Text>
+            <Text style={styles.inputLabel}>이름을 입력해 주세요.</Text>
             <TextInput
                 style={styles.input}
                 placeholder="이름"
                 value={name}
                 onChangeText={text => setName(text)}
             />
+            <Text style={styles.inputLabel}>이메일을 입력해 주세요.</Text>
             <TextInput
                 style={styles.input}
                 placeholder="Email"
@@ -84,13 +69,15 @@ const SignUp = () => {
                 value={email}
                 onChangeText={text => setEmail(text)}
             />
+            <Text style={styles.inputLabel}>비밀번호를 입력해 주세요.</Text>
             <TextInput
                 style={styles.input}
-                placeholder="비밀번호를 입력해주세요"
+                placeholder="비밀번호"
                 secureTextEntry={true}
                 value={password}
                 onChangeText={text => setPassword(text)}
             />
+            <Text style={styles.inputLabel}>비밀번호를 다시 한 번 입력해 주세요.</Text>
             <TextInput
                 style={[styles.input, !passwordMatch && styles.inputError]}
                 placeholder="비밀번호 확인"
@@ -108,17 +95,17 @@ const SignUp = () => {
             <View style={styles.checkboxContainer}>
                 <CheckBox
                     value={gender === 'male'}
-                    onValueChange={handleCheckboxChange}
+                    onValueChange={() => handleCheckboxChange('male')}
                 />
                 <Text style={styles.checkboxLabel}>Male</Text>
                 <CheckBox
                     value={gender === 'female'}
-                    onValueChange={handleCheckboxChange}
+                    onValueChange={() => handleCheckboxChange('female')}
                 />
                 <Text style={styles.checkboxLabel}>Female</Text>
             </View>
             <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                <Text style={styles.buttonText}>회원가입!!</Text>
+                <Text style={styles.buttonText}>회원가입 하기</Text>
             </TouchableOpacity>
         </View>
     );
@@ -130,15 +117,20 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#f2f2f2',
+        backgroundColor: '#F5FBEF',
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 24,
+        marginBottom: 30,
+    },
+    inputLabel: {
+        fontSize: 14,
+        marginBottom: 6,
+
     },
     input: {
-        width: '80%',
+        width: '70%',
         height: 48,
         padding: 12,
         borderWidth: 1,
@@ -156,16 +148,18 @@ const styles = StyleSheet.create({
         marginLeft: 8,
     },
     button: {
-        width: '80%',
+        width: '70%',
         height: 48,
-        backgroundColor: '#007bff',
+        backgroundColor: '#86B404',
         borderRadius: 4,
+        borderColor: '#ddd',
+        borderWidth: 1,
         alignItems: 'center',
         justifyContent: 'center',
     },
     buttonText: {
         fontSize: 16,
-        color: '#fff',
+        color: '#FFFFFF',
         fontWeight: 'bold',
     },
     inputError: {
@@ -177,4 +171,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default SignUp;
+export default RegistScreen;
