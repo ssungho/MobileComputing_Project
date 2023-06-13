@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+import {useNavigation} from '@react-navigation/native';
 import {
   View,
   TextInput,
@@ -9,6 +10,8 @@ import {
 } from 'react-native';
 
 const LoginScreen = () => {
+  const navigation = useNavigation();
+
   const [userEmail, setUserEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
 
@@ -31,6 +34,8 @@ const LoginScreen = () => {
           Alert.alert('알림', '이메일을 잘못 입력하였습니다.');
         } else if (responseText === 'success') {
           Alert.alert('로그인 완료!');
+          // 로그인 완료시 Main으로 이동
+          navigation.navigate('Main');
         } else {
           Alert.alert('오류', '로그인 중 오류가 발생했습니다.');
         }
